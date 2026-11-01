@@ -1,65 +1,129 @@
+# LowerAudit: project memory
+
+*NPU Lowering Coverage: Rank-Bounded Coverage Analysis of Real MLIR Lowering Pipelines.*
+Research candidate E (#2), the intended flagship master's direction.
+
+**Stage:** reconnaissance done (2026-11-01). Spike runs 8–15 Nov 2026. Topic freeze 15 Nov;
+project decision 30 Nov.
+
+Read [STATUS.md](STATUS.md) first. This file holds only stable rules and pointers; detail lives in `docs/`.
+
 ## Mission
- 
-Build a research tool that evaluates the coverage and reachability of real MLIR lowering pipelines targeting NPU dialects.
- 
-The tool treats an existing conversion pipeline as an executable system rather than reimplementing its lowering rules. It generates or enumerates valid source-operation configurations within a declared domain, runs them through the real conversion, and records which cases are successfully lowered and which registered patterns fire.
- 
-The research goal is to establish a principled completeness result: under explicit assumptions about how the conversion depends on tensor rank, determine a sufficient rank bound such that checking all relevant cases up to that bound is enough to establish the result for all ranks.
- 
-## Core research questions
- 
-1. **Case coverage:** Does the real conversion successfully lower every valid source-operation configuration in a declared domain?
-2. **Pattern reachability:** Which registered lowering patterns fire, which never fire, and under what conditions?
-3. **Rank generalization:** Can rank-dependent behavior be characterized so that a finite set of rank checks is sufficient to reason about all ranks?
-4. **Practicality:** Can these checks be performed against real MLIR conversion pipelines without replacing their implementation?
- 
-## Intended architecture
- 
-- **Haskell driver:** Orchestrate test generation, execution, result collection, normalization, analysis, and report generation.
-- **MLIR execution layer:** Invoke the actual conversion pipeline and preserve its real conversion behavior.
-- **Input-domain model:** Explicitly describe valid source operations, types, attributes, shapes, and other relevant parameters.
-- **Coverage analysis:** Record successfully lowered cases, rejected cases, and unexplained failures.
-- **Pattern instrumentation:** Determine which registered patterns are attempted and which successfully apply, to the extent the MLIR implementation permits reliable observation.
-- **Rank analysis:** Identify rank-sensitive conditions and derive a sufficient bound only where a sound argument is possible.
-- **Reporting:** Produce reproducible coverage reports, pattern-reachability reports, and counterexample inputs.
- 
-## Scope boundaries
- 
-This is not a general claim to solve compiler lowering completeness for arbitrary compilers.
- 
-The target is real MLIR conversion infrastructure and a declared, technically bounded source domain. Every completeness statement must specify that domain and its assumptions.
- 
-General lowering completeness is established prior art. The intended contribution is the narrower combination of:
-- systematic coverage checking against real conversion implementations;
-- reporting never-fired or unreachable lowering patterns;
-- a sufficient-rank argument that can generalize finite checks to an unbounded rank domain, when the conversion satisfies the required conditions.
- 
-Do not claim that a finite empirical test establishes completeness for all inputs or all ranks.
- 
-## Implementation preference
- 
-Use Haskell as the orchestration and analysis driver. Do not force the MLIR implementation itself into Haskell. Use the smallest practical integration layer needed to execute and observe the real conversion pipeline.
- 
-Keep the tool modular so that the input generator, MLIR adapter, coverage model, rank analysis, and reporting can be independently tested.
- 
-## Research discipline
- 
-- Distinguish verified facts, hypotheses, assumptions, and open questions.
-- Cite primary sources and exact versions/commits for claims about MLIR and target conversions.
-- Do not treat a pattern that did not fire in a test corpus as proven unreachable.
-- Do not confuse pattern reachability with lowering completeness.
-- Do not infer a sufficient rank bound from a few passing examples.
-- Do not describe the project as novel until the closest prior work has been checked.
+
+Treat an existing MLIR conversion as an executable system, not as rules to re-implement:
+
+- enumerate the valid source-op cases in a declared domain;
+- run the real conversion on them;
+- record which cases lower and which registered patterns fire.
+
+Under explicit assumptions about how the conversion depends on tensor rank, find a bound such that
+checking the ranks below it establishes the result for all ranks. The project is not authorized
+to assume that this theorem exists, or that a target satisfies it.
+
+## Research questions
+
+1. **Coverage:** does the real conversion lower every valid case in the declared domain D?
+2. **Reachability:** which registered patterns are observed to apply, which never are, and under
+   what conditions?
+3. **Rank generalization:** under which source-level conditions does a finite rank check imply the
+   result for all ranks? Does the target meet them?
+4. **Practicality:** can 1–3 be run against unmodified MLIR conversions with a thin adapter?
+
+## Current scope (provisional; see the decision log)
+
+- **Pin:** Homebrew LLVM 23.1.1 = `llvmorg-23.1.1`, `6dfe1677ab8d`. Tools are in
+  `/opt/homebrew/opt/llvm/bin`, not on PATH. It is a Release build with assertions off, so there is
+  no `-debug-only`; `--log-actions-to` works.
+- **Proposed first target** (D-004, awaiting the user): `tosa-to-linalg` and
+  `tosa-to-linalg-pipeline` at the pin. Its output is Linalg, **not an NPU dialect**.
+- **Proposed domain D0** (D-005): a single `tosa.reduce_sum`, with `tosa.add` as the
+  rank-uniform control. See the [problem statement](docs/research/problem-statement.md).
+- **Out of scope:** multi-op programs; semantic correctness of the output; NXP Neutron (Idea M,
+  a separate candidate).
+- **Provisional novelty claim:** a checker for every case in a declared domain, with
+  never-fired-pattern reporting, applied to real MLIR conversions. Execution is black-box; the
+  rank obligations are discharged against the source (D-006). A sufficient-rank theorem extends
+  finite-rank checks to all ranks under stated conditions.
+
+## Architecture preferences
+
+- Haskell (GHC 9.10.3, cabal 3.16) drives everything: domain, enumeration, classification, rank
+  analysis, reports. Keep these modules independently testable.
+- MLIR remains the execution authority. The boundary is processes and files: `.mlir` in, JSON
+  lines out. No FFI.
+- C++ is used only for a small adapter that attaches `RewriterBase::Listener`. Its output must
+  match `mlir-opt`'s byte for byte (the fidelity check).
+  See [architecture](docs/design/architecture.md).
+
+## Distinctions that must not blur
+
+- **Coverage is not reachability.** A pattern can fire on every case and coverage can still fail
+  (O3).
+- **Pattern states:** registered → attempted → match failed or applied → survived or rolled back
+  → *not observed* on the tested set. "Unreachable in D" is only allowed via Corollary 2 of the
+  rank theorem, with its obligations discharged.
+- **Four rank propositions:** same branch, same outcome, same pattern set, same coverage verdict
+  ([rank-bound](docs/theory/rank-bound.md)).
+- **The validity oracle is declared per result** (V_mlir or V_tosa1.0). A verdict can flip with
+  the oracle (O3).
+- **Pass vs. pipeline:** the default pipeline validates first (rank ≤ 6, static shapes only); the
+  bare pass does not.
+- **A failure is not automatically a gap:** classify it as invalid, documented rejection, or gap,
+  then triage gaps against the spec.
+
+## Prior-work pointers
+
+| Line of work | Works |
+|---|---|
+| Instruction-selector completeness | Emmelmann CC'92; Brandner ASAP'10 |
+| Sufficient completeness | Maude SCC; Rocha & Meseguer LPAR'10 |
+| Exhaustiveness and useless clauses | Maranget JFP'07 |
+| Generated complete backends | ACT, OOPSLA'26 |
+| Rule coverage in a production compiler | LLVM GlobalISel `CodeGenCoverage` |
+| Cutoffs and counter abstraction | Emerson & Kahlon CADE'00; Pnueli, Xu & Zuck CAV'02 |
+| Complete test suites under a state bound | Chow TSE'78 |
+
+The matrix, verdict and links are in the [novelty audit](docs/research/novelty-audit.md).
+
+## Unknowns that gate work
+
+The full list is in [risks and open questions](docs/risks-and-open-questions.md). Gating now:
+OQ-1 (whether a non-NPU first target is acceptable).
+
+## Operating rules for AI sessions
+
+1. Read `CLAUDE.md` and `STATUS.md` before proposing project work.
+2. Inspect relevant source code before making claims about implementation behaviour. Cite it at
+   the pin as `file:line`.
+3. Never claim a pattern is unreachable merely because it did not fire in a finite test.
+4. Never claim all-rank completeness based only on empirical finite-rank tests.
+5. Cite primary sources for research claims. Mark preprints and technical reports as such.
+6. Keep verified facts separate from hypotheses and assumptions, and label each.
+7. Prefer small, runnable experiments over speculative architecture.
+8. Do not broaden the declared input domain without recording the decision.
+9. Record theorem assumptions and proof status explicitly in `docs/theory/rank-bound.md`.
+10. Do not silently change the project's research question or novelty claim.
+11. When new evidence contradicts the current framing, update the relevant files and explain the
+    change in the decision log.
+12. Do not write implementation code until the initial target, the domain and the minimal vertical
+    slice are sufficiently understood and accepted (D-004, D-005).
+
+Also:
+
 - Preserve negative results and counterexamples.
-- Record every scope change and theorem assumption.
- 
-## Current status
- 
-Research candidate E (#2), intended flagship master's research direction.
- 
-The narrowed novelty claim is provisional:
-A checker for every case in a declared domain, including never-fired pattern reporting, applied to real MLIR conversions as black boxes, with a sufficient-rank theorem that extends finite-rank checks to all ranks under stated conditions.
- 
-A feasibility spike is planned for 8–15 November 2026. The most important early question is whether the target conversion's rank-sensitive behavior is governed by finite threshold comparisons or whether it contains constructs that invalidate a finite sufficient-rank argument.
- 
-The project is not yet authorized to assume that the theorem exists or that the target conversion satisfies its conditions.
+- Do not call the project novel before the audit's "not yet checked" list is done.
+- Keep these docs self-contained: do not cite or depend on other local repositories.
+- Keep project memory in this repo, not in global AI memory.
+
+## File map
+
+| File | Holds |
+|---|---|
+| [STATUS.md](STATUS.md) | facts, hypotheses, blockers, next actions |
+| [docs/research/problem-statement.md](docs/research/problem-statement.md) | terms, success definition, target comparison, domain D0, RQs |
+| [docs/research/novelty-audit.md](docs/research/novelty-audit.md) | prior work, comparison matrix, verdict |
+| [docs/theory/rank-bound.md](docs/theory/rank-bound.md) | rank-dependency inventory, theorem, obligations, proof status |
+| [docs/design/architecture.md](docs/design/architecture.md) | components, Haskell/MLIR boundary, vertical slice |
+| [docs/experiments/initial-spike.md](docs/experiments/initial-spike.md) | 8–15 Nov plan, experiments A–F, GO criteria, probes run |
+| [docs/risks-and-open-questions.md](docs/risks-and-open-questions.md) | risks and open questions |
+| [docs/decisions/decision-log.md](docs/decisions/decision-log.md) | decisions, alternatives, evidence |
