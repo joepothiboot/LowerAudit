@@ -7,7 +7,7 @@ Assumptions:
 
 - About 12 hours over 8 days. This is an assumption; correct it if wrong.
 - Commits: tt-mlir `f9dc1b3e5101`, LLVM `4efe170d858e`. No LLVM or project source build happens here (D-015).
-- The target and domain are accepted. OQ-10, OQ-11 and OQ-12 are answered before day 1.
+- The target and domain are accepted. OQ-10, OQ-11 and OQ-12 are answered (D-017).
 
 **Standing limit.** D-015 keeps the source-build limit in force, and `ttmlir-opt` needs a source build. So
 every row or experiment marked **gated** below cannot run until a new decision entry lifts the limit. All
@@ -36,8 +36,8 @@ Every experiment records:
 - the generator's git SHA;
 - one results folder per run.
 
-All class predictions below come from conjectures H6 and H7 in [rank-bound](../theory/rank-bound.md) §5. Exact
-commands wait for OQ-11.
+All class predictions below come from conjectures H6 and H7 in [rank-bound](../theory/rank-bound.md) §5. Commands and
+per-class predictions are in [expected outcomes](expected-outcomes.md).
 
 ### A. Basic coverage (gated)
 
@@ -75,7 +75,7 @@ commands wait for OQ-11.
 
 ### E. Known-gap detection (gated)
 
-- **Hypothesis:** the tool finds (a) an injected gap, by filtering `ReductionProdOpConversionPattern` out of the adapter's pattern set, and (b) the candidate gaps in rank-bound §5 if OQ-10 includes negative encoding, each with a minimal witness.
+- **Hypothesis:** the tool finds (a) an injected gap, by filtering `ReductionProdOpConversionPattern` out of the adapter's pattern set, and (b) the raw-negative-index candidate gap in rank-bound §5, in scope by D-017, each with a minimal witness.
 - **Controls:** an unmodified adapter run.
 - **Measure:** witness rank and size; time to the first witness.
 - **Falsified if:** the injected gap is missed, or a reported witness is not shortlex-minimal.
@@ -88,7 +88,7 @@ commands wait for OQ-11.
   - dim out of range (`negative_invalid_dim_low.mlir`, `negative_invalid_dim_high.mlir`);
   - repeated dims (`negative_repeating_dims.mlir`);
   - result shape mismatch (`negative_shape_mismatch.mlir`);
-  - rank 5 (`negative_reduce_prod_op.mlir:1-7`), with the class OQ-12 sets;
+  - rank 5 (`negative_reduce_prod_op.mlir:1-7`), `EXPECTED_REJECTION` (D-017);
   - an ill-typed case like O7.
 - **Measure:** a confusion matrix of true class against reported class.
 - **Falsified if:** any invalid control is reported as `CONVERSION_FAILED` or `OUTPUT_INVALID`.

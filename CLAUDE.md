@@ -68,7 +68,7 @@ to assume that this theorem exists, or that a target satisfies it.
 - **The validity oracle is declared per result.** The current one is V_ttir. A verdict can flip with
   the oracle, as O3 did on the earlier target.
 - **Pass vs. pipeline:** the pipeline runs decomposition and other passes around the conversion, so a
-  case the bare pass rejects may still lower through it. The exact commands are open (OQ-11).
+  case the bare pass rejects may still lower through it. The exact commands are in D-017.
 - **A failure is not automatically a gap:** classify it as invalid, documented rejection, or gap,
   then triage gaps against the evidence. No spec backs V_ttir, so "the verifier accepts it" is the
   claim, not "a spec requires it".
@@ -92,9 +92,7 @@ The matrix, verdict and links are in the [novelty audit](docs/research/novelty-a
 The full list is in [risks and open questions](docs/risks-and-open-questions.md). Gating now:
 
 - D-015 (the source-build limit) blocks every run on the target.
-- OQ-10 (dim encoding) blocks the domain model and the expected outcomes.
-- OQ-11 (exact bare-pass and pipeline commands) and OQ-12 (the class of a documented rank-5 rejection)
-  block the expected outcomes.
+- The vertical slice is still proposed, so rule 12 blocks implementation code.
 
 ## Operating rules for AI sessions
 
@@ -164,5 +162,6 @@ section.
 | [docs/theory/rank-bound.md](docs/theory/rank-bound.md) | rank-dependency inventory, theorem, obligations, proof status |
 | [docs/design/architecture.md](docs/design/architecture.md) | components, Haskell/MLIR boundary, vertical slice |
 | [docs/experiments/initial-spike.md](docs/experiments/initial-spike.md) | 8–15 Nov plan, experiments A–F, GO criteria, probes run |
+| [docs/experiments/expected-outcomes.md](docs/experiments/expected-outcomes.md) | predictions before any run; frozen at first commit |
 | [docs/risks-and-open-questions.md](docs/risks-and-open-questions.md) | risks and open questions |
 | [docs/decisions/decision-log.md](docs/decisions/decision-log.md) | decisions, alternatives, evidence |

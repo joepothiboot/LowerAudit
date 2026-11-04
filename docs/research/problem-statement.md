@@ -55,10 +55,10 @@ There is one validity oracle (D-014):
 | `CRASH` | signal, assertion or LLVM fatal error | yes |
 | `TIMEOUT` | wall-clock limit exceeded | yes |
 
-**Open (OQ-12):** **[H]** a rank-5 `ttir.prod` should convert and then fail `ttnn.prod`'s verifier
+**Decided (D-017):** **[H]** a rank-5 `ttir.prod` should convert and then fail `ttnn.prod`'s verifier
 (`TTNNOps.cpp:6026-6031,6085-6087`), and `negative_reduce_prod_op.mlir:1-7` documents that diagnostic.
-It is therefore both "output does not verify" and "documented". This table does not say which class
-wins, and the choice must be made before predictions are frozen.
+It is both "output does not verify" and "documented". A failure with this diagnostic is `EXPECTED_REJECTION` at
+any r ≥ 5, and is still reported.
 
 Candidate definitions of "successfully handled":
 
@@ -113,12 +113,12 @@ LLVM does not stand in for it. Comparison of the candidates, with costs, is in
 | Target definition | `TTIRToTTNNPass.cpp:41-60`, with an identity type converter (`:62-64`). |
 | Patterns | Public `populateTTIRToTTNNPatterns` (`TTIRToTTNN.h:13`). |
 
-**Modes are not decided (OQ-11).** **[F]** Candidates:
+**Modes (D-017).** **[F]** The flags exist at the commit; neither command has been run here.
 
-- bare: `--convert-ttir-to-ttnn` (`Passes.td:158`), which lit prefixes with `--ttcore-register-device --ttnn-layout`
-  (`avg_pool2d_negative_tests.mlir:1`);
-- pipeline: `--ttir-to-ttnn-runtime-pipeline` (`TTNNPipelines.cpp:874`). The name `--ttir-to-ttnn-backend-pipeline`
-  is marked deprecated and calls the same function (`:883-885`), and is what lit uses.
+- bare: `ttmlir-opt --ttcore-register-device --ttnn-layout --convert-ttir-to-ttnn` (`Passes.td:158`), the prefix lit
+  uses (`avg_pool2d_negative_tests.mlir:1`). **[H]** A case can therefore fail in `--ttnn-layout`, before the conversion.
+- pipeline: `ttmlir-opt --ttir-to-ttnn-runtime-pipeline`, no options (`TTNNPipelines.cpp:874`). Lit uses the name
+  `--ttir-to-ttnn-backend-pipeline`, which is marked deprecated and calls the same function (`:883-885`).
 
 ## 6. Domain (accepted, D-013)
 
@@ -132,7 +132,7 @@ Called **D0-tt** below. Representative op: `ttir.prod`
 | dim letter at each position | `1`, `s` (static > 1), `?` (dynamic) | representatives for `s`: 2, plus 3 and 7, as before. **[H]** whether `?` survives the pipeline is unknown; no `ttir.prod` lit test uses it |
 | dim marks | a set of reduced positions, or `dim_arg` absent (all) | **[F]** `I32ArrayAttr`, optional (`TTIROps.td:2744`). **[H]** an empty list is out until decided |
 | `keep_dim` | true, false | **[F]** determines the result shape in the verifier (`TTIROps.cpp:6724-6730`) |
-| dim encoding | **open (OQ-10)** | **[F]** the verifier allows `-r ≤ d < r` (`:6708`); brief tt-A lists negative encoding; D-013 does not settle it |
+| dim encoding | positive or negative per marked dim (D-017) | **[F]** the verifier allows `-r ≤ d < r` (`:6708`). Lists naming one position twice stay out |
 | element type | f32, bf16, si32 | **[F]** all seen in `ttir.prod` or `ttir.sum` lit |
 
 The result type follows from these: **[F]** the verifier requires exactly that shape
@@ -153,8 +153,9 @@ Outside D0-tt, with the reason:
 | positive only | 2^r | 2·6^r | 3,108 | 111,972 |
 | positive or negative per marked dim | 3^r | 2·9^r | 14,760 | 1,195,740 |
 
-These exclude repeated-position lists such as `[d, d−r]` (§5 of [rank-bound](../theory/rank-bound.md)). **[H]** Whether either
-column is small enough for one process per case is unknown: this was never timed on `ttmlir-opt`.
+D-017 selects the second row. Both rows exclude repeated-position lists such as `[d, d−r]` (§5 of
+[rank-bound](../theory/rank-bound.md)). **[H]** Whether that is small enough for one process per case is unknown: this
+was never timed on `ttmlir-opt`.
 
 ## 7. Research questions, in falsifiable form
 

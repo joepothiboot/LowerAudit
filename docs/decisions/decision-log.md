@@ -186,3 +186,23 @@ NXP Neutron (Idea M) is a separate candidate and stays out unless the user choos
 - **Citation update:** D-011 and D-015 cite the build limit at `initial-spike.md` lines 9 and 109. After this
   rework it is at lines 9 and 102.
 - **Proposed, not accepted:** the vertical slice in `docs/design/architecture.md` §3, so rule 12 still holds.
+
+## D-017 · 2026-11-04 · ACCEPTED · Dim encoding, mode commands and the rank-5 class (OQ-10, OQ-11, OQ-12)
+
+- **Decision, OQ-10:** D0-tt has positive or negative encoding per marked dim, so 2·9^r cases per type and op at rank
+  r. Lists naming one position twice, such as `[d, d−r]`, stay out: D-013 says a set of marks. They are probes only.
+- **Decision, OQ-11:** the bare pass is `ttmlir-opt --ttcore-register-device --ttnn-layout --convert-ttir-to-ttnn`.
+  The pipeline is `ttmlir-opt --ttir-to-ttnn-runtime-pipeline`, with no options.
+- **Decision, OQ-12:** a failure carrying `ttnn.prod`'s rank diagnostic is `EXPECTED_REJECTION` at any r ≥ 5, whatever
+  the letters, type and `keep_dim`. It is still reported. Beyond the shape the lit test covers (r = 5, one dim, f32),
+  that this diagnostic is what occurs is a conjecture.
+- **Alternatives:** OQ-10: positive only; also admitting repeated positions. OQ-11: omitting `--ttnn-layout`; the
+  deprecated pipeline name. OQ-12: only the lit-tested shape; `OUTPUT_INVALID` always.
+- **Evidence:** at the pin, 5 lit RUN lines use that bare prefix unchanged and 1 omits `--ttnn-layout`. Pipeline names:
+  `TTNNPipelines.cpp:874-885`. Rank diagnostic: `TTNNOps.cpp:6026-6031`, `negative_reduce_prod_op.mlir:1-7`.
+- **Cost:** `--ttnn-layout` is part of the bare command, so a case can fail before the conversion starts. **[H]** Reading
+  suggests `?` does exactly that (`include/ttmlir/Utils.h:49`). The failing stage must be recorded with the class.
+- **Framing (rule 11):** the request for expected outcomes named D0 and two oracles; on 2026-11-04 the user chose to
+  apply it to D0-tt under V_ttir instead. Reading for it corrected `docs/theory/rank-bound.md` §5: partial marks at
+  r ≥ 5 on the bare pass fail the pattern, not the verifier. It also added to H6 whether `?` is in the last two positions.
+- **Predictions:** `docs/experiments/expected-outcomes.md`, frozen at its first commit.

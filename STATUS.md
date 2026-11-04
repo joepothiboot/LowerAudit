@@ -31,6 +31,7 @@ At tt-mlir `f9dc1b3e5101` and LLVM `4efe170d858e`; citations are in the
   into a chain, and it is what the pipeline runs first.
 - The target needs its own LLVM source build; this machine's compilers are numerically outside its
   documented clang range.
+- Domain encoding, mode commands and the rank-5 class are decided (D-017). The bare command includes `--ttnn-layout`.
 
 **Record: MLIR at `llvmorg-23.1.1` (TosaToLinalg, verified 2026-11-01)**
 
@@ -63,8 +64,9 @@ At tt-mlir `f9dc1b3e5101` and LLVM `4efe170d858e`; citations are in the
   pattern is rank-free, and `ttir.prod`'s one threshold found so far is a documented rejection.
 - **H4:** no published work combines exhaustive, oracle-judged coverage of real MLIR conversions
   with a rank cutoff.
-- **H6:** `ttir.prod`'s outcome depends only on element type, whether r > 4, the mark summary, `keep_dim`,
-  possibly `?`, and the mode ([rank-bound §5](docs/theory/rank-bound.md)).
+- **H6:** `ttir.prod`'s outcome depends only on element type, whether r > 4, the mark summary, the sign of
+  partial `dim_arg` entries, `keep_dim`, `?` and whether it is in the last two positions, and the mode
+  ([rank-bound §5](docs/theory/rank-bound.md)).
 - **H7:** `ttir.sum`'s outcome on the bare pass does not depend on rank.
 
 Parked with TosaToLinalg, never tested ([rank-bound §7](docs/theory/rank-bound.md)):
@@ -88,16 +90,14 @@ Parked with TosaToLinalg, never tested ([rank-bound §7](docs/theory/rank-bound.
   assumptions and §3). No `ttmlir-opt` exists here, so the conversion and V_ttir cannot execute.
 - **Rule 12:** the target and domain are accepted, but the vertical slice in
   [architecture §3](docs/design/architecture.md) is still proposed, so implementation code waits.
-- **OQ-10, OQ-11, OQ-12:** dim encoding, mode commands and the class of the rank-5 rejection. These block
-  the expected outcomes.
 
 If a first-target build is ever allowed and fails on this machine: stop and report a negative result
 (D-011).
 
 ## Next actions
 
-1. The user answers OQ-10, OQ-11 and OQ-12, and accepts or changes the vertical slice.
-2. Write the expected outcomes, before any run.
+1. The user edits and commits the [expected outcomes](docs/experiments/expected-outcomes.md), which freezes them.
+2. The user accepts or changes the vertical slice.
 3. The user decides whether and when to lift the build limit. The spike's experiments cannot run until
    then, and its GO table's row 1 has no evidence (see the [spike plan](docs/experiments/initial-spike.md) §4).
 4. Read the full texts listed in [novelty audit §4](docs/research/novelty-audit.md).

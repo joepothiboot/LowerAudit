@@ -38,6 +38,7 @@ proof obligations are **[H]** until the closure inventory exists.
 | `TTIRToTTIRDecomposition.cpp:1809-1845` | one `ttir.prod` per reduced dim | chain length grows with the number of marks | S7 | **needs the separate argument S7 asks for** |
 | `TTIROps.cpp:6845-6858` | none; boolean-valued input | canonicalizer may rewrite `prod` to `min` | none | **[H]** not reached by a lone function argument |
 | `IntegerProdOpRewritePattern.cpp:24,31,47-48` | integer type, one dim, size test against `kMaxIntegerProdUnrollSize` | workaround after conversion | breaks A2 for `s` on si32 | pipeline only; the letter `s` is not constant under this predicate |
+| `lib/Dialect/TTNN/Utils/Utils.cpp:289-301`; `include/ttmlir/Utils.h:49`; `TTNNLayout.cpp:86-87,243-245` | `alignUp` on the last two dims of a tiled shape, with `assert(val >= 0)` | **[H]** `?` in those positions aborts `ttnn-layout`, before the conversion | S4 | regular as a role relative to the end; depends on tt-mlir's build having assertions |
 | `TTNNPipelines.cpp:392` | element-type normalization | may change element types before conversion | unknown | pipeline only; not read |
 | Not yet inventoried | `ttcore-register-device`, `ttnn-layout`, the workarounds pass (`TTNNPipelines.cpp:332`), fusing, canonicalization, the `ttnn.prod` builder | unknown | unknown | needed for any pipeline-level claim |
 
@@ -153,29 +154,32 @@ is claimed. It records what the source reading in §2 suggests, so that it can b
 - the element type;
 - whether r > 4;
 - the mark summary: one, all (`dim_arg` absent or |list| = r), or partial (1 < |list| < r);
-- `keep_dim`, and the letter `?` if it matters at all;
+- `keep_dim`, and the letter `?`, including whether it is in the last two positions;
+- the sign of `dim_arg` entries on partial lists;
 - the mode (bare or pipeline).
 
 **H7 (conjecture).** `ttir.sum`'s outcome does not depend on r at all, on the bare pass.
 
-**Predicted classes, to test only once the target can run:**
+**Predicted classes, to test only once the target can run.** This is the summary for static letters and positive dims.
+The per-class predictions, frozen at their first commit, are in [expected outcomes](../experiments/expected-outcomes.md).
 
 | Case | Bare pass | Pipeline | Rests on |
 |---|---|---|---|
 | r ≤ 4, one or all | `LOWERED`; `ReductionProdOpConversionPattern` applied | `LOWERED` | `TTIRToTTNN.cpp:251-278`; `simple_prod.mlir` for ranks 1, 3, 4 |
 | 3 ≤ r ≤ 4, partial | match failure, then `CONVERSION_FAILED` | `LOWERED`, by a chain of single-dim `ttir.prod` | `TTIRToTTNN.cpp:258-261`; `TTIRToTTIRDecomposition.cpp:1809-1845`; no lit test seen for partial marks |
-| r ≥ 5, any | fails `ttnn.prod`'s verifier; class per OQ-12 | same | `TTNNOps.cpp:6028`; `negative_reduce_prod_op.mlir:1-7` for r = 5, one dim, f32 |
+| r ≥ 5, one or all | fails `ttnn.prod`'s verifier: `EXPECTED_REJECTION` (D-017) | same | `TTNNOps.cpp:6028`; `negative_reduce_prod_op.mlir:1-7` for r = 5, one dim, f32 |
+| r ≥ 5, partial | match failure, then `CONVERSION_FAILED`; no `ttnn.prod` is created | fails `ttnn.prod`'s verifier: `EXPECTED_REJECTION` (D-017) | `TTIRToTTNN.cpp:258-261`; `TTIRToTTIRDecomposition.cpp:1831-1845`. Corrected 2026-11-04: this row previously said the verifier fails in both modes |
 
 **What would falsify H6:** an outcome that changes with bulk letters alone, with the rank beyond 5 alone, or with
 the representative of `s` on f32.
 
 **Known weak points, each [H]:**
 
-- **`?`:** no `ttir.prod` lit test uses it, and the layout pass and the workarounds were not read.
+- **`?`:** no `ttir.prod` lit test uses it. In the last two positions it should abort `ttnn-layout` if tt-mlir has assertions (§2), which would make `ttir.sum` crash too. In earlier positions the path was not traced to the end, and the workarounds were not read.
 - **si32 in the pipeline:** the integer workaround tests a size against `kMaxIntegerProdUnrollSize`, so A2 as written fails there. The letter `s` may need splitting, or si32 restricting to the bare pass.
 - **Unexamined passes:** H6 ignores everything listed "not yet inventoried" in §2.
 
-**Candidate gaps, by reading only. Untriaged, and relevant only if negative encoding is in D0-tt (OQ-10):**
+**Candidate gaps, by reading only, and untriaged. D-017 puts the raw negative index in D0-tt and leaves repeated positions out, as probes:**
 
 - **Raw negative index.** `ReductionProdPattern` uses `dim_arg` values directly as `shape[dim]` and
   `shape.begin() + dim` (`TTIRToTTIRDecomposition.cpp:1818,1831-1837`), while V_ttir allows negatives. A partial
