@@ -23,11 +23,12 @@ Updated 2026-11-01. Likelihood and impact are rated H, M or L.
 
 | Id | Question | Blocks | Who decides |
 |---|---|---|---|
-| OQ-1 | Is a non-NPU first target (TosaToLinalg) acceptable for the spike? | spike day 1 | user |
-| OQ-2 | Which oracle gives headline numbers? Default: report both, headline V_tosa1.0. | reporting | user (default stands unless changed) |
+| OQ-1 | **Closed 2026-11-04: no (D-010).** Is a non-NPU first target (TosaToLinalg) acceptable for the spike? | nothing | user |
+| OQ-9 | **Closed 2026-11-04: tt-mlir TTIR→TTNN on `ttir.prod` (D-012, D-013).** Which NPU-dialect conversion is the first target, and what is its domain? | nothing | user |
+| OQ-2 | **Closed 2026-11-04: V_ttir, the only oracle (D-014).** Which oracle gives headline numbers? | nothing | user |
 | OQ-3 | Is O3 a known upstream issue, and is a dynamic result dim at the axis intended to be valid TOSA in MLIR? | O3 triage | evidence: upstream tracker, TOSA spec |
 | OQ-4 | Exact failure condition of `inferExpandShapeOutputShape` at the pin | rank-bound §5 | source reading |
-| OQ-5 | Second target: tt-mlir TTIR→TTNN or TorchToTosa? | after the spike | user, with spike data |
+| OQ-5 | Second target: which, now that tt-mlir is first (D-012)? The option set is open; TorchToTosa's status as a second target is unsettled by D-010. | after the spike | user, with spike data |
 | OQ-6 | Can pattern success be observed without rebuilding the pass target (e.g. an action handler)? Current reading: no. | C2 design | source reading |
 | OQ-7 | How much of obligation checking can be mechanized for C++ patterns? | RQ3 strength | research |
 | OQ-8 | Does a standard-math cutoff theorem with source-discharged obligations count as the theory component? | topic freeze | advisor |

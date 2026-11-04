@@ -1,7 +1,8 @@
-# Status: 2026-11-01
+# Status: 2026-11-04
 
-**Stage:** reconnaissance complete. Spike not started. No tool code.
-**Blocked on:** OQ-1 ([open questions](docs/risks-and-open-questions.md)).
+**Stage:** reconnaissance complete. Spike not started. Cabal skeleton only; no tool logic.
+**First target:** tt-mlir TTIR→TTNN at `f9dc1b3e5101`, on `ttir.prod`, oracle V_ttir (D-012 to D-014).
+**Blocked on:** the source-build limit (D-015): the target cannot be built or run here.
 
 ## Confirmed facts (verified 2026-11-01)
 
@@ -63,12 +64,21 @@
 
 ## Unresolved blockers
 
-- **OQ-1:** whether a non-NPU first target is acceptable.
+- **Source-build limit:** in force with no end date ([spike plan](docs/experiments/initial-spike.md)
+  lines 9 and 109; D-015). No `ttmlir-opt` exists here, so the conversion and V_ttir cannot execute.
+- **Rule 12:** the target and domain are accepted, but the minimal vertical slice still describes
+  TosaToLinalg, so implementation code waits for the rework below.
+
+If a first-target build is ever allowed and fails on this machine: stop and report a negative result
+(D-011).
 
 ## Next actions
 
-1. The user answers OQ-1.
-2. Read the full texts listed in [novelty audit §4](docs/research/novelty-audit.md).
-3. Search the upstream tracker for O3 (OQ-3).
-4. Read `inferExpandShapeOutputShape` (OQ-4).
-5. Run the [spike](docs/experiments/initial-spike.md).
+1. Do the rework listed in [D-015](docs/decisions/decision-log.md).
+2. The user decides whether and when to lift the build limit; the spike cannot run on this target
+   until then.
+3. Read the full texts listed in [novelty audit §4](docs/research/novelty-audit.md).
+4. Ask the advisor whether a verifier-only oracle is acceptable (D-014, OQ-8).
+
+Parked with TosaToLinalg, kept as a record: searching the upstream tracker for O3 (OQ-3) and reading
+`inferExpandShapeOutputShape` (OQ-4).
