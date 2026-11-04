@@ -2,8 +2,11 @@ module Main (main) where
 
 import ConcretizeSpec qualified
 import DomainSpec qualified
+import EnumerateSpec qualified
 import LowerAudit (toolName)
+import ManifestSpec qualified
 import OracleSpec qualified
+import RenderSpec qualified
 import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
@@ -16,4 +19,7 @@ main =
             , DomainSpec.tests
             , OracleSpec.tests
             , ConcretizeSpec.tests
+            , EnumerateSpec.tests
+            , RenderSpec.tests
+            , ManifestSpec.tests
             ]

@@ -1,0 +1,1 @@
+{"dimLetters":["1","s","?"],"elementTypes":["f32","bf16","si32"],"keepDim":[false,true],"marks":["unmarked","positive","negative"],"name":"D0-tt","ops":["ttir.prod","ttir.sum"],"rankBound":4,"representative":2}

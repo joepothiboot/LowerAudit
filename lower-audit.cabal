@@ -16,7 +16,15 @@ library
     LowerAudit
     LowerAudit.Concretize
     LowerAudit.Domain
+    LowerAudit.Enumerate
+    LowerAudit.Manifest
     LowerAudit.Oracle
+    LowerAudit.Render
+  build-depends:
+    , aeson
+    , bytestring
+    , SHA
+    , text
 
 executable lower-audit
   import:         shared
@@ -32,11 +40,16 @@ test-suite lower-audit-test
   other-modules:
     ConcretizeSpec
     DomainSpec
+    EnumerateSpec
     Generators
+    ManifestSpec
     OracleSpec
+    RenderSpec
   build-depends:
+    , bytestring
     , lower-audit
     , tasty
     , tasty-golden
     , tasty-hunit
     , tasty-quickcheck
+    , text
