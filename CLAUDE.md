@@ -115,11 +115,43 @@ Also:
 - Keep these docs self-contained: do not cite or depend on other local repositories.
 - Keep project memory in this repo, not in global AI memory.
 
+## Modes for coding sessions
+
+Every coding prompt begins with `Mode: BUILD | STUB | REVIEW | QUIZ`. "You" is the AI session; "the
+user" writes the Haskell and C++ in STUB and REVIEW work. The operating rules above win over this
+section.
+
+- **BUILD:** you write it. Prompts that run experiments are BUILD and never edit `src/` or
+  `adapter/`.
+- **STUB:** you write only types, signatures with bodies `error "TODO: <function>"` (C++: a body
+  that reports "TODO: <function>" and fails), tests, and `docs/TODO-<phase>.md`. No implementation,
+  not even a hint. The project must build, and new tests fail only on the TODOs. The TODO file lists
+  the functions in the order to implement them, with one `## Spec: <function>` entry each
+  (signature, behaviour, edge and error cases, which tests check it). Anything the tests do not pin
+  down goes under "Open questions".
+- **REVIEW:** the user wrote it. Run the tests, read `git diff`, and coach with the hint ladder.
+  Never rewrite the user's code unless they type `show solution`.
+- **QUIZ:** 5 multiple-choice questions (A–D), one at a time; grade each, explain why each
+  distractor is wrong. At least 3 on purpose and design trade-offs. Append to
+  [docs/LEARNING-LOG.md](docs/LEARNING-LOG.md).
+- **Hint ladder:** (1) a question, (2) a pointer to the exact doc page (GHC User's Guide, Hackage,
+  MLIR docs or a header at the pin), (3) a skeleton with holes, (4) a full solution only on
+  `show solution`.
+- **Code style:** no prose comments or Haddock in `src/`, `app/`, `adapter/` or `test/`; only
+  comments a tool needs (pragmas). Specs, design notes, extension and dependency reasons, and
+  deliberate shortcuts go in `docs/TODO-<phase>.md` under "Spec", "Decisions" and "Shortcuts". Small
+  modules, explicit export lists, flat conditionals, no partial functions in `src/`.
+- **Missing binaries:** tests that need `mlir-opt` or the adapter skip (not fail) when the binary is
+  missing, and print why.
+- **`mlir-opt` location:** read from one place (an environment variable with the Homebrew path as
+  the default), never hard-coded twice.
+
 ## File map
 
 | File | Holds |
 |---|---|
 | [STATUS.md](STATUS.md) | facts, hypotheses, blockers, next actions |
+| [docs/LEARNING-LOG.md](docs/LEARNING-LOG.md) | quiz results from QUIZ sessions |
 | [docs/research/problem-statement.md](docs/research/problem-statement.md) | terms, success definition, target comparison, domain D0, RQs |
 | [docs/research/novelty-audit.md](docs/research/novelty-audit.md) | prior work, comparison matrix, verdict |
 | [docs/theory/rank-bound.md](docs/theory/rank-bound.md) | rank-dependency inventory, theorem, obligations, proof status |
