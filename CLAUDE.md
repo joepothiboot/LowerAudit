@@ -3,8 +3,8 @@
 *NPU Lowering Coverage: Rank-Bounded Coverage Analysis of Real MLIR Lowering Pipelines.*
 Research candidate E (#2), the intended flagship master's direction.
 
-**Stage:** reconnaissance done (2026-11-01). Spike runs 8–15 Nov 2026. Topic freeze 15 Nov;
-project decision 30 Nov.
+**Stage:** target and domain accepted (2026-11-04); not runnable here while the build limit holds
+(D-015). Spike planned for 8–15 Nov 2026. Topic freeze 15 Nov; project decision 30 Nov.
 
 Read [STATUS.md](STATUS.md) first. This file holds only stable rules and pointers; detail lives in `docs/`.
 
@@ -31,13 +31,14 @@ to assume that this theorem exists, or that a target satisfies it.
 
 ## Current scope (provisional; see the decision log)
 
-- **Pin:** Homebrew LLVM 23.1.1 = `llvmorg-23.1.1`, `6dfe1677ab8d`. Tools are in
-  `/opt/homebrew/opt/llvm/bin`, not on PATH. It is a Release build with assertions off, so there is
-  no `-debug-only`; `--log-actions-to` works.
-- **Proposed first target** (D-004, awaiting the user): `tosa-to-linalg` and
-  `tosa-to-linalg-pipeline` at the pin. Its output is Linalg, **not an NPU dialect**.
-- **Proposed domain D0** (D-005): a single `tosa.reduce_sum`, with `tosa.add` as the
-  rank-uniform control. See the [problem statement](docs/research/problem-statement.md).
+- **First target** (D-012): TTIR→TTNN in tt-mlir at `f9dc1b3e5101`. Tool: `ttmlir-opt`, which
+  does not exist here yet.
+- **Pin** (D-012): `llvm/llvm-project` `4efe170d858e` (22.0 dev) for the target. D-001's Homebrew LLVM
+  23.1.1 (`llvmorg-23.1.1`, `6dfe1677ab8d`) applies only to the dated TosaToLinalg probes O1–O8.
+- **Domain D0-tt** (D-013): a single `ttir.prod`, with `ttir.sum` as the control. See the
+  [problem statement](docs/research/problem-statement.md).
+- **Oracle** (D-014): V_ttir only, the parser and TTIR verifiers. No spec backs it.
+- **Build limit** (D-015): no LLVM or project source build until a new decision entry lifts it.
 - **Out of scope:** multi-op programs; semantic correctness of the output; NXP Neutron (Idea M,
   a separate candidate).
 - **Provisional novelty claim:** a checker for every case in a declared domain, with
@@ -52,7 +53,7 @@ to assume that this theorem exists, or that a target satisfies it.
 - MLIR remains the execution authority. The boundary is processes and files: `.mlir` in, JSON
   lines out. No FFI.
 - C++ is used only for a small adapter that attaches `RewriterBase::Listener`. Its output must
-  match `mlir-opt`'s byte for byte (the fidelity check).
+  match `ttmlir-opt`'s byte for byte (the fidelity check).
   See [architecture](docs/design/architecture.md).
 
 ## Distinctions that must not blur
@@ -64,12 +65,13 @@ to assume that this theorem exists, or that a target satisfies it.
   rank theorem, with its obligations discharged.
 - **Four rank propositions:** same branch, same outcome, same pattern set, same coverage verdict
   ([rank-bound](docs/theory/rank-bound.md)).
-- **The validity oracle is declared per result** (V_mlir or V_tosa1.0). A verdict can flip with
-  the oracle (O3).
-- **Pass vs. pipeline:** the default pipeline validates first (rank ≤ 6, static shapes only); the
-  bare pass does not.
+- **The validity oracle is declared per result.** The current one is V_ttir. A verdict can flip with
+  the oracle, as O3 did on the earlier target.
+- **Pass vs. pipeline:** the pipeline runs decomposition and other passes around the conversion, so a
+  case the bare pass rejects may still lower through it. The exact commands are open (OQ-11).
 - **A failure is not automatically a gap:** classify it as invalid, documented rejection, or gap,
-  then triage gaps against the spec.
+  then triage gaps against the evidence. No spec backs V_ttir, so "the verifier accepts it" is the
+  claim, not "a spec requires it".
 
 ## Prior-work pointers
 
@@ -88,7 +90,11 @@ The matrix, verdict and links are in the [novelty audit](docs/research/novelty-a
 ## Unknowns that gate work
 
 The full list is in [risks and open questions](docs/risks-and-open-questions.md). Gating now:
-OQ-1 (whether a non-NPU first target is acceptable).
+
+- D-015 (the source-build limit) blocks every run on the target.
+- OQ-10 (dim encoding) blocks the domain model and the expected outcomes.
+- OQ-11 (exact bare-pass and pipeline commands) and OQ-12 (the class of a documented rank-5 rejection)
+  block the expected outcomes.
 
 ## Operating rules for AI sessions
 
@@ -106,7 +112,8 @@ OQ-1 (whether a non-NPU first target is acceptable).
 11. When new evidence contradicts the current framing, update the relevant files and explain the
     change in the decision log.
 12. Do not write implementation code until the initial target, the domain and the minimal vertical
-    slice are sufficiently understood and accepted (D-004, D-005).
+    slice are sufficiently understood and accepted (D-012, D-013, and the slice in
+    `docs/design/architecture.md` §3, which is still proposed).
 
 Also:
 

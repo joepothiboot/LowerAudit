@@ -172,3 +172,17 @@ NXP Neutron (Idea M) is a separate candidate and stays out unless the user choos
     5 and 6; the probes stay as a record.
   - `docs/risks-and-open-questions.md`: R1, R2, R4, R5, R6, R7, R8, R9, R11; OQ-3, OQ-4, OQ-6, OQ-8.
   - `docs/research/novelty-audit.md`: §2's "at the pin" rows; §3's condition on non-trivial rank logic.
+
+## D-016 · 2026-11-04 · ACCEPTED · Docs reworked for the accepted target (rule 11)
+
+- **Decision:** the rework listed in D-010 and D-015 is done. TosaToLinalg's probes, inventory, predictions and
+  comparison stay as dated records. No decision, research question or novelty claim changed.
+- **Citations:** current `file:line` citations were read at tt-mlir `f9dc1b3e5101` and LLVM `4efe170d858e`, and
+  anything unread or unrun is marked as a hypothesis. Citations at `llvmorg-23.1.1` appear only in records.
+- **New names:** D0-tt for D-013's domain; H6 and H7 for the conjectures in `docs/theory/rank-bound.md` §5.
+  H1, H2 and H5 are parked, never tested.
+- **New open questions:** OQ-10 (dim encoding), OQ-11 (mode commands), OQ-12 (class of a documented rejection whose
+  output does not verify). New risk: R13.
+- **Citation update:** D-011 and D-015 cite the build limit at `initial-spike.md` lines 9 and 109. After this
+  rework it is at lines 9 and 102.
+- **Proposed, not accepted:** the vertical slice in `docs/design/architecture.md` §3, so rule 12 still holds.

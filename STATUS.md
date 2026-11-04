@@ -18,7 +18,21 @@
   `--log-actions-to` and `--mlir-debug-counter`. The MLIR CMake package and
   `libMLIRTosaToLinalg.a` are installed.
 
-**MLIR at the pin**
+**Target, read from source on 2026-11-04 (nothing run)**
+
+At tt-mlir `f9dc1b3e5101` and LLVM `4efe170d858e`; citations are in the
+[problem statement](docs/research/problem-statement.md) and [rank-bound](docs/theory/rank-bound.md).
+
+- `convert-ttir-to-ttnn` is a full conversion with a public populate function, and the listener API is
+  present at this LLVM.
+- V_ttir has no rank cap for `ttir.prod`, but `ttnn.prod`'s verifier rejects rank > 4, and a negative
+  lit test documents that at rank 5.
+- The `ttir.prod` pattern fails to match a partial mark set. The decomposition pass splits such a set
+  into a chain, and it is what the pipeline runs first.
+- The target needs its own LLVM source build; this machine's compilers are numerically outside its
+  documented clang range.
+
+**Record: MLIR at `llvmorg-23.1.1` (TosaToLinalg, verified 2026-11-01)**
 
 - `tosa-to-linalg` runs `applyFullConversion`. TOSA is illegal except for nine ops, and unknown
   ops are legal (`TosaToLinalgPass.cpp:50–72`).
@@ -28,7 +42,7 @@
   (`PatternMatch.h:407,414`), called by the conversion driver (`DialectConversion.cpp:2760,2799,2830`).
 - The action log records attempts only (`PatternApplicator.h:30–40`).
 
-**Probes O1–O8** ([spike plan](docs/experiments/initial-spike.md#reconnaissance-probes-run-on-2026-11-01))
+**Record: probes O1–O8, on TosaToLinalg** ([spike plan](docs/experiments/initial-spike.md#reconnaissance-probes-run-on-2026-11-01))
 
 - The pipeline rejects rank ≥ 7 and every dynamic dimension.
 - The bare pass lowered static `reduce_sum` at ranks 1–8.
@@ -36,9 +50,8 @@
 
 **Candidates and literature**
 
-- Candidate repos were inspected at their HEADs; commits are in
-  [problem statement §5](docs/research/problem-statement.md). Each NPU candidate pins a different
-  LLVM, so it needs a source build.
+- NPU candidates were read at pinned commits and compared in
+  [brief-oq9](docs/decisions/brief-oq9.md). Each pins a different LLVM, so it needs a source build.
 - 16 papers, preprints and reports, plus two software artifacts (GlobalISel rule coverage and the
   MLIR conversion hooks), are verified at bibliographic or abstract level
   ([novelty audit](docs/research/novelty-audit.md)).
@@ -46,12 +59,19 @@
 
 ## Provisional hypotheses (not verified)
 
-- **H1:** `ReduceConverter`'s outcome depends only on element type, whether r = 1, and the
-  {axis, partner} letters ([rank-bound §5](docs/theory/rank-bound.md)).
-- **H2:** `PointwiseConverter`'s outcome does not depend on rank.
-- **H3:** tt-mlir and TorchToTosa contain enough threshold logic to make Theorem 1 non-trivial.
+- **H3:** tt-mlir contains enough threshold logic to make Theorem 1 non-trivial. Not settled: `ttir.sum`'s
+  pattern is rank-free, and `ttir.prod`'s one threshold found so far is a documented rejection.
 - **H4:** no published work combines exhaustive, oracle-judged coverage of real MLIR conversions
   with a rank cutoff.
+- **H6:** `ttir.prod`'s outcome depends only on element type, whether r > 4, the mark summary, `keep_dim`,
+  possibly `?`, and the mode ([rank-bound §5](docs/theory/rank-bound.md)).
+- **H7:** `ttir.sum`'s outcome on the bare pass does not depend on rank.
+
+Parked with TosaToLinalg, never tested ([rank-bound §7](docs/theory/rank-bound.md)):
+
+- **H1:** `ReduceConverter`'s outcome depends only on element type, whether r = 1, and the
+  {axis, partner} letters.
+- **H2:** `PointwiseConverter`'s outcome does not depend on rank.
 - **H5:** O3 is a defect rather than intended behaviour.
 
 ## Completed investigations
@@ -64,21 +84,24 @@
 
 ## Unresolved blockers
 
-- **Source-build limit:** in force with no end date ([spike plan](docs/experiments/initial-spike.md)
-  lines 9 and 109; D-015). No `ttmlir-opt` exists here, so the conversion and V_ttir cannot execute.
-- **Rule 12:** the target and domain are accepted, but the minimal vertical slice still describes
-  TosaToLinalg, so implementation code waits for the rework below.
+- **Source-build limit:** in force with no end date (D-015; [spike plan](docs/experiments/initial-spike.md)
+  assumptions and §3). No `ttmlir-opt` exists here, so the conversion and V_ttir cannot execute.
+- **Rule 12:** the target and domain are accepted, but the vertical slice in
+  [architecture §3](docs/design/architecture.md) is still proposed, so implementation code waits.
+- **OQ-10, OQ-11, OQ-12:** dim encoding, mode commands and the class of the rank-5 rejection. These block
+  the expected outcomes.
 
 If a first-target build is ever allowed and fails on this machine: stop and report a negative result
 (D-011).
 
 ## Next actions
 
-1. Do the rework listed in [D-015](docs/decisions/decision-log.md).
-2. The user decides whether and when to lift the build limit; the spike cannot run on this target
-   until then.
-3. Read the full texts listed in [novelty audit §4](docs/research/novelty-audit.md).
-4. Ask the advisor whether a verifier-only oracle is acceptable (D-014, OQ-8).
+1. The user answers OQ-10, OQ-11 and OQ-12, and accepts or changes the vertical slice.
+2. Write the expected outcomes, before any run.
+3. The user decides whether and when to lift the build limit. The spike's experiments cannot run until
+   then, and its GO table's row 1 has no evidence (see the [spike plan](docs/experiments/initial-spike.md) §4).
+4. Read the full texts listed in [novelty audit §4](docs/research/novelty-audit.md).
+5. Ask the advisor whether a verifier-only oracle is acceptable (D-014, OQ-8).
 
 Parked with TosaToLinalg, kept as a record: searching the upstream tracker for O3 (OQ-3) and reading
 `inferExpandShapeOutputShape` (OQ-4).

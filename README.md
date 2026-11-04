@@ -2,16 +2,16 @@
 
 **NPU Lowering Coverage: Rank-Bounded Coverage Analysis of Real MLIR Lowering Pipelines**
 
-> **Status:** research planning; no tool code yet. Every claim of novelty or feasibility below is
-> provisional until the 8–15 November 2026 spike ([plan](docs/experiments/initial-spike.md)).
+> **Status:** research planning; a build skeleton but no tool logic yet. Every claim of novelty or
+> feasibility below is provisional until the spike ([plan](docs/experiments/initial-spike.md)).
 > Current facts are in [STATUS.md](STATUS.md).
 
 ## Problem
 
 An MLIR lowering is a set of C++ rewrite patterns run by the dialect-conversion driver. Which
 inputs it actually handles is spread across pattern guards, helper functions, type converters,
-and the builders and verifiers of the ops it creates. Lit tests sample a few shapes: at
-LLVM 23.1.1, the TosaToLinalg reduce tests use ranks 1–3 only.
+and the builders and verifiers of the ops it creates. Lit tests sample a few shapes: in tt-mlir at
+`f9dc1b3e5101`, the TTNN `ttir.prod` reduction tests use ranks 1, 3 and 4, plus one negative test at rank 5.
 
 For a declared input domain, two questions follow:
 
@@ -47,9 +47,12 @@ combination, applied to real MLIR conversions.
 ## Current stage
 
 - Workspace, toolchain and literature reconnaissance were done on 2026-11-01.
-- Proposed first target: upstream `tosa-to-linalg` at `llvmorg-23.1.1`. It runs from Homebrew
-  with no LLVM build and has a spec-backed validity oracle. Its output is Linalg, not an NPU
-  dialect; an NPU-dialect second target will be chosen after the spike.
+- First target, accepted: TTIR→TTNN in tt-mlir at `f9dc1b3e5101`, an NPU dialect, on `ttir.prod` with
+  `ttir.sum` as the control. Its validity oracle is the TTIR verifiers; no spec backs it.
+- It needs an LLVM and project source build, and a source-build limit is in force, so **nothing has been
+  run on this target**. What is written about it comes from reading its source.
+- An earlier proposed target, upstream `tosa-to-linalg`, was rejected as an NPU first target. Its eight
+  probes and inventory are kept as a dated record.
 - Topic freeze is 15 Nov 2026. The project decision is 30 Nov 2026.
 
 ## Repository layout
@@ -73,5 +76,5 @@ Present now:
 
 Planned (created when first needed, not before):
 
-    adapter/                          C++ listener adapter, built against the pinned MLIR
+    adapter/                          C++ listener adapter, built against the target's tree
     results/<date>-<target>-<what>/   one folder per run: inputs, commands, outputs
