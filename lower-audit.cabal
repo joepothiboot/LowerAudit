@@ -1,0 +1,33 @@
+cabal-version: 3.14
+name:          lower-audit
+version:       0.1.0.0
+build-type:    Simple
+tested-with:   GHC ==9.10.3
+
+common shared
+  default-language: GHC2021
+  ghc-options:      -Wall
+  build-depends:    base ^>=4.20
+
+library
+  import:          shared
+  hs-source-dirs:  src
+  exposed-modules: LowerAudit
+
+executable lower-audit
+  import:         shared
+  hs-source-dirs: app
+  main-is:        Main.hs
+  build-depends:  lower-audit
+
+test-suite lower-audit-test
+  import:         shared
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Main.hs
+  build-depends:
+    , lower-audit
+    , tasty
+    , tasty-golden
+    , tasty-hunit
+    , tasty-quickcheck

@@ -64,9 +64,14 @@ Present now:
     docs/experiments/   spike plan, experiment specs, reconnaissance probes
     docs/decisions/     decision log
     docs/risks-and-open-questions.md
+    docs/LEARNING-LOG.md  quiz results
+    docs/TODO-l0.md       setup decisions and dependency reasons
+    lower-audit.cabal     the one cabal package
+    cabal.project         compiler pin
+    Makefile              build, test, check
+    src/, app/, test/     Haskell library, executable and tests (skeleton only)
 
 Planned (created when first needed, not before):
 
-    app/, src/                        Haskell driver (one cabal package)
     adapter/                          C++ listener adapter, built against the pinned MLIR
     results/<date>-<target>-<what>/   one folder per run: inputs, commands, outputs
