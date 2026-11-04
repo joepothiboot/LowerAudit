@@ -12,7 +12,11 @@ common shared
 library
   import:          shared
   hs-source-dirs:  src
-  exposed-modules: LowerAudit
+  exposed-modules:
+    LowerAudit
+    LowerAudit.Concretize
+    LowerAudit.Domain
+    LowerAudit.Oracle
 
 executable lower-audit
   import:         shared
@@ -25,6 +29,11 @@ test-suite lower-audit-test
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
   main-is:        Main.hs
+  other-modules:
+    ConcretizeSpec
+    DomainSpec
+    Generators
+    OracleSpec
   build-depends:
     , lower-audit
     , tasty
