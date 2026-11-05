@@ -20,6 +20,8 @@ library
     LowerAudit.Enumerate
     LowerAudit.Manifest
     LowerAudit.Oracle
+    LowerAudit.Patterns
+    LowerAudit.Rank
     LowerAudit.Render
     LowerAudit.Report
     LowerAudit.Run
@@ -50,6 +52,7 @@ test-suite lower-audit-test
   build-tool-depends: lower-audit:lower-audit
   other-modules:
     AdapterSpec
+    CertificateBoundarySpec
     ClassifySpec
     ConcretizeSpec
     DomainSpec
@@ -58,6 +61,7 @@ test-suite lower-audit-test
     Generators
     ManifestSpec
     OracleSpec
+    PatternsSpec
     ProbeSpec
     RenderSpec
     ReportSpec
