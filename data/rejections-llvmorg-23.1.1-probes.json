@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tosa-level-rank",
+    "diagnostic": "op failed level check: operand rank(shape) <= MAX_RANK",
+    "stage": "pass",
+    "source": "mlir/lib/Dialect/Tosa/Transforms/TosaValidation.cpp:275-276",
+    "documentedBy": "mlir/test/Dialect/Tosa/level_check.mlir:366"
+  },
+  {
+    "id": "tosa-level-dynamic",
+    "diagnostic": "op failed level check: operand shape dimension cannot be dynamic when targeting TOSA specification version 1.0 or below",
+    "stage": "pass",
+    "source": "mlir/lib/Dialect/Tosa/Transforms/TosaValidation.cpp:909-911",
+    "documentedBy": "mlir/test/Dialect/Tosa/tosa-validation-version-1p0-invalid.mlir:166"
+  }
+]

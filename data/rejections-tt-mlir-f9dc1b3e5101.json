@@ -1,0 +1,9 @@
+[
+  {
+    "id": "ttnn-prod-rank",
+    "diagnostic": "'ttnn.prod' op Input tensor rank is greater than 4 for reduce(product).",
+    "stage": "verification",
+    "source": "lib/Dialect/TTNN/IR/TTNNOps.cpp:6029-6030",
+    "documentedBy": "test/ttmlir/Dialect/TTNN/reduction/negative_reduce_prod_op.mlir:4"
+  }
+]

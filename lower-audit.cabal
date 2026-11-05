@@ -14,15 +14,19 @@ library
   hs-source-dirs:  src
   exposed-modules:
     LowerAudit
+    LowerAudit.Classify
     LowerAudit.Concretize
     LowerAudit.Domain
     LowerAudit.Enumerate
     LowerAudit.Manifest
     LowerAudit.Oracle
     LowerAudit.Render
+    LowerAudit.Run
   build-depends:
     , aeson
     , bytestring
+    , directory
+    , process
     , SHA
     , text
 
@@ -30,6 +34,7 @@ executable lower-audit
   import:         shared
   hs-source-dirs: app
   main-is:        Main.hs
+  ghc-options:    -threaded
   build-depends:  lower-audit
 
 test-suite lower-audit-test
@@ -37,19 +42,28 @@ test-suite lower-audit-test
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
   main-is:        Main.hs
+  ghc-options:    -threaded
   other-modules:
+    ClassifySpec
     ConcretizeSpec
     DomainSpec
     EnumerateSpec
+    ExecutableOracleSpec
     Generators
     ManifestSpec
     OracleSpec
+    ProbeSpec
     RenderSpec
+    RunSpec
   build-depends:
+    , aeson
     , bytestring
+    , directory
+    , filepath
     , lower-audit
     , tasty
     , tasty-golden
     , tasty-hunit
     , tasty-quickcheck
+    , temporary
     , text
