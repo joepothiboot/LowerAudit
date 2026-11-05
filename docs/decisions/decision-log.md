@@ -206,3 +206,20 @@ NXP Neutron (Idea M) is a separate candidate and stays out unless the user choos
   apply it to D0-tt under V_ttir instead. Reading for it corrected `docs/theory/rank-bound.md` §5: partial marks at
   r ≥ 5 on the bare pass fail the pattern, not the verifier. It also added to H6 whether `?` is in the last two positions.
 - **Predictions:** `docs/experiments/expected-outcomes.md`, frozen at its first commit.
+
+## D-018 · 2026-11-05 · PROPOSED · Match-failure reasons do not reach the listener; observe them by wrapping each pattern
+
+- **Decision:** the adapter gets a pattern's match-failure reason by replacing each registered pattern with a wrapper. For the length of the original's `matchAndRewrite`, the wrapper puts a forwarding listener on the rewriter, and that listener also passes match failures on. The conversion, its patterns and their results are otherwise untouched. Not in force until the user accepts it: `observeMatchFailures` in `adapter/main.cpp` is a stub.
+- **Alternatives:**
+  - Drop reasons. Events then show begin and end with `failure`, and a reason is read from the source. No shim, but Exp B's "with its reason" (`initial-spike.md:23,52,54`) cannot be met.
+  - `ConversionConfig::notifyCallback`. It is called only inside `LLVM_DEBUG` (`DialectConversion.h:1383-1386`), so never on a Release build, and on the target only with `-debug`.
+  - A debug build of LLVM. D-015 forbids it, and it would not reach the listener either.
+- **Evidence (rule 11):** this contradicts Exp B's hypothesis and architecture row C2, which assume the listener receives reasons.
+  - **[F]** At `llvmorg-23.1.1`, `ConversionPatternRewriter` installs its impl as the rewriter's listener (`DialectConversion.cpp:2154`), so `notifyMatchFailure` lands there, and the whole body of that method is inside `LLVM_DEBUG` (`:2134-2143`). It never calls `config.listener`, in any build. The target's LLVM `4efe170d858e` has the same code (`DialectConversion.cpp:2077-2086`).
+  - **[M]** Homebrew 23.1.1, on a throwaway adapter: with the listener alone, the unranked control gives begin and end `failure`, and no reason. With the wrapper, it gives `unranked tensors not supported`, and 18 of 18 fixtures keep byte-identical stdout and stderr against `mlir-opt`.
+  - **[F]** Upstream swaps the rewriter's listener around `matchAndRewrite` the same way, in debug builds only (`PatternApplicator.cpp:214-222`).
+- **Cost:**
+  - A shim between the driver and every pattern, which is a fidelity risk the listener alone does not have (R5).
+  - A reason the driver raises itself (`DialectConversion.cpp:1520`) stays invisible.
+  - **[H]** Not run on the target. The target's pattern set may use interface or trait roots, which this pattern set does not.
+- **Rework if accepted, not yet done:** `docs/experiments/initial-spike.md:52` should say the reason comes from the wrapper, not the listener. That file changes only by the user's decision. See [TODO-l7](../TODO-l7.md) Open question 1.

@@ -142,6 +142,10 @@ section.
 - **Hint ladder:** (1) a question, (2) a pointer to the exact doc page (GHC User's Guide, Hackage,
   MLIR docs or a header at the pin), (3) a skeleton with holes, (4) a full solution only on
   `show solution`.
+- **Branches and CI:** [CI](.github/workflows/ci.yml) runs every test, so a `TODO` stub is red by design. A STUB
+  session works on a branch, never on `main`; if it starts on `main`, it creates the branch first. That branch merges
+  only after the matching REVIEW passes and CI is green. The L2–L5 stubs predate this rule and are already on `main`,
+  so its test job stays red until their REVIEWs pass.
 - **Code style:** no prose comments or Haddock in `src/`, `app/`, `adapter/` or `test/`; only
   comments a tool needs (pragmas). Specs, design notes, extension and dependency reasons, and
   deliberate shortcuts go in `docs/TODO-<phase>.md` under "Spec", "Decisions" and "Shortcuts". Small
@@ -165,3 +169,4 @@ section.
 | [docs/experiments/expected-outcomes.md](docs/experiments/expected-outcomes.md) | predictions before any run; frozen at first commit |
 | [docs/risks-and-open-questions.md](docs/risks-and-open-questions.md) | risks and open questions |
 | [docs/decisions/decision-log.md](docs/decisions/decision-log.md) | decisions, alternatives, evidence |
+| [.github/workflows/ci.yml](.github/workflows/ci.yml) | build and test with `-Werror`; format and lint |
