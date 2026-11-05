@@ -86,7 +86,7 @@ The failing stage (parse and verify, named conversion, conversion, verification)
 | registered | in the pattern set | **[H]** adapter dumps pattern debug names; `populateTTIRToTTNNPatterns` is at `TTIRToTTNN.cpp:3800-3963` |
 | considered | the driver selected it for an op | **[F]** listener `notifyPatternBegin` (`DialectConversion.cpp:2719`) |
 | attempted | `matchAndRewrite` invoked | **[F]** listener begin. **[H]** action log, not re-read at this LLVM |
-| match failed | returned failure, optionally with a reason | **[F]** listener `notifyPatternEnd(failure)` (`DialectConversion.cpp:2758`). `TTIRToTTNN.cpp:259-261` is one such reason |
+| match failed | returned failure, optionally with a reason | **[F]** listener `notifyPatternEnd(failure)` (`DialectConversion.cpp:2758`). `TTIRToTTNN.cpp:259-261` is one such reason. **[F]** The reason itself does not reach the listener (`DialectConversion.cpp:2077-2086`; D-018) |
 | applied | returned success | **[F]** listener `notifyPatternEnd(success)` (`DialectConversion.cpp:2792`) |
 | survived | applied and not rolled back | **[H]** begin/end nesting plus final IR. **[F]** Rollback defaults on (`DialectConversion.h:1417`) |
 | not observed | registered, never applied on any tested case | analysis over results |

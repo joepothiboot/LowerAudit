@@ -73,8 +73,8 @@ Present now:
     cabal.project         compiler pin
     Makefile              build, test, check
     src/, app/, test/     Haskell library, executable and tests (skeleton only)
+    adapter/              C++ listener adapter (skeleton), on the dated TosaToLinalg record for now
 
 Planned (created when first needed, not before):
 
-    adapter/                          C++ listener adapter, built against the target's tree
     results/<date>-<target>-<what>/   one folder per run: inputs, commands, outputs

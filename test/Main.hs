@@ -1,5 +1,6 @@
 module Main (main) where
 
+import AdapterSpec qualified
 import ClassifySpec qualified
 import ConcretizeSpec qualified
 import DomainSpec qualified
@@ -34,4 +35,5 @@ main =
             , ExecutableOracleSpec.tests
             , ReportSpec.tests
             , SliceSpec.tests
+            , AdapterSpec.tests
             ]

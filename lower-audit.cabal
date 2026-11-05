@@ -49,6 +49,7 @@ test-suite lower-audit-test
   ghc-options:    -threaded
   build-tool-depends: lower-audit:lower-audit
   other-modules:
+    AdapterSpec
     ClassifySpec
     ConcretizeSpec
     DomainSpec
