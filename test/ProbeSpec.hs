@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module ProbeSpec (liveCase, tests) where
+module ProbeSpec (liveCase, rejections, tests) where
 
 import Data.ByteString.Lazy qualified as Lazy
 import Data.Maybe (fromMaybe, isNothing)

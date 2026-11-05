@@ -10,7 +10,9 @@ import ManifestSpec qualified
 import OracleSpec qualified
 import ProbeSpec qualified
 import RenderSpec qualified
+import ReportSpec qualified
 import RunSpec qualified
+import SliceSpec qualified
 import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
@@ -30,4 +32,6 @@ main =
             , ClassifySpec.tests
             , ProbeSpec.tests
             , ExecutableOracleSpec.tests
+            , ReportSpec.tests
+            , SliceSpec.tests
             ]
