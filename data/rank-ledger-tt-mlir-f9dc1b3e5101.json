@@ -1,0 +1,47 @@
+[
+  {
+    "target": "tt-mlir f9dc1b3e5101",
+    "conversion": "bare: ReductionProdOpConversionPattern",
+    "domain": "D0-tt",
+    "oracle": "V_ttir",
+    "states": null,
+    "validityStates": null,
+    "obligations": [
+      { "id": "A1", "status": "open", "evidence": [] },
+      { "id": "A2", "status": "open", "evidence": [] },
+      { "id": "A3", "status": "open", "evidence": [] },
+      { "id": "A4", "status": "open", "evidence": [] },
+      { "id": "A5", "status": "open", "evidence": [] }
+    ]
+  },
+  {
+    "target": "tt-mlir f9dc1b3e5101",
+    "conversion": "bare: ReductionOpConversionPattern (ttir.sum)",
+    "domain": "D0-tt",
+    "oracle": "V_ttir",
+    "states": null,
+    "validityStates": null,
+    "obligations": [
+      { "id": "A1", "status": "open", "evidence": [] },
+      { "id": "A2", "status": "open", "evidence": [] },
+      { "id": "A3", "status": "open", "evidence": [] },
+      { "id": "A4", "status": "open", "evidence": [] },
+      { "id": "A5", "status": "open", "evidence": [] }
+    ]
+  },
+  {
+    "target": "tt-mlir f9dc1b3e5101",
+    "conversion": "pipeline",
+    "domain": "D0-tt",
+    "oracle": "V_ttir",
+    "states": null,
+    "validityStates": null,
+    "obligations": [
+      { "id": "A1", "status": "open", "evidence": [] },
+      { "id": "A2", "status": "open", "evidence": [] },
+      { "id": "A3", "status": "open", "evidence": [] },
+      { "id": "A4", "status": "open", "evidence": [] },
+      { "id": "A5", "status": "open", "evidence": [] }
+    ]
+  }
+]
