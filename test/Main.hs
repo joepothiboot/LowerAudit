@@ -1,17 +1,20 @@
 module Main (main) where
 
 import AdapterSpec qualified
+import AutomatonSpec qualified
 import CertificateBoundarySpec qualified
 import ClassifySpec qualified
 import ConcretizeSpec qualified
 import DomainSpec qualified
 import EnumerateSpec qualified
 import ExecutableOracleSpec qualified
+import LedgerSpec qualified
 import LowerAudit (toolName)
 import ManifestSpec qualified
 import OracleSpec qualified
 import PatternsSpec qualified
 import ProbeSpec qualified
+import RankSpec qualified
 import RenderSpec qualified
 import ReportSpec qualified
 import RunSpec qualified
@@ -39,5 +42,8 @@ main =
             , SliceSpec.tests
             , AdapterSpec.tests
             , PatternsSpec.tests
+            , AutomatonSpec.tests
+            , LedgerSpec.tests
+            , RankSpec.tests
             , CertificateBoundarySpec.tests
             ]

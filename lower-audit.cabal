@@ -14,10 +14,12 @@ library
   hs-source-dirs:  src
   exposed-modules:
     LowerAudit
+    LowerAudit.Automaton
     LowerAudit.Classify
     LowerAudit.Concretize
     LowerAudit.Domain
     LowerAudit.Enumerate
+    LowerAudit.Ledger
     LowerAudit.Manifest
     LowerAudit.Oracle
     LowerAudit.Patterns
@@ -29,6 +31,7 @@ library
   build-depends:
     , aeson
     , bytestring
+    , containers
     , directory
     , filepath
     , process
@@ -52,6 +55,7 @@ test-suite lower-audit-test
   build-tool-depends: lower-audit:lower-audit
   other-modules:
     AdapterSpec
+    AutomatonSpec
     CertificateBoundarySpec
     ClassifySpec
     ConcretizeSpec
@@ -59,10 +63,13 @@ test-suite lower-audit-test
     EnumerateSpec
     ExecutableOracleSpec
     Generators
+    LedgerSpec
     ManifestSpec
     OracleSpec
     PatternsSpec
     ProbeSpec
+    RankFixtures
+    RankSpec
     RenderSpec
     ReportSpec
     RunSpec
