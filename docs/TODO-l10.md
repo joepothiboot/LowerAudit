@@ -341,9 +341,29 @@ In `LowerAudit.Patterns`. This is [TODO-l8](TODO-l8.md#spec-markunreachable)'s e
 - **A refusal is a value.** Nothing throws, so a report can hold a refused level next to the levels below it.
 - **The committed ledger is a data file**, as `data/rejections-*.json` is, one per pin. Every obligation is open and k is null, as rank-bound §6 says. It records no evidence, and is the honest state today.
 - **Test ledgers are built in the test,** with the evidence `synthetic: records nothing about any target`. No file exists that could be mistaken for a record of a discharge.
-- **The tests were checked** against a throwaway implementation in a scratch copy, since deleted. See the table below.
+- **The tests were checked** against a throwaway implementation in a scratch copy, since deleted. **[M]** All 219 passed. Each row below is one change to it, and all 114 changes were caught. The first run left three uncaught, and tests were added for them: `prose with pipes in it is not a row either`, a bare `A` row in `other tables' rows are not obligations`, and `and the reverse: another scope's open entry does not block this one`.
 
-MUTATION_TABLE_PLACEHOLDER
+  | Change | Tests failing, of 219 |
+  |---|---|
+  | checks to 2N, not 2N − 1 | 50 |
+  | **N is k + k_V** | 47 |
+  | `stateCount` understates k by one | 40 |
+  | **open passes the gate** | 18 |
+  | window off by one; empirical starts at rank 0 | 15 |
+  | **checks only to N − 1** | 14 |
+  | `StableFrom` reports where it stopped; declared outcome not compared | 11 |
+  | `run` reads the word backwards; positions numbered from 1; only the first problem named | 10 |
+  | product steps only the left automaton; letter pairs in both directions; the verdict always holds; the claim is dropped | 9 |
+  | **shortest word walks letters in reverse**; **no abstraction gets a trivial bound** | 8 |
+  | masks compared from the start; checks only to 2N − 2; the scope is not matched | 7 |
+  | N is max k k_V; N is k, validity ignored; checks only to N; only the target matched; any A-prefixed cell is an obligation; any letter and digits is an obligation | 6 |
+  | masks compared from the end; **the document's list ignored, only listed obligations count** | 5 |
+  | shortest word not reversed back; a missing file is an exception; empirical stops one rank short; **short ranks are certified anyway**; an omitted obligation passes; the k check before the obligations; `highestLevel` takes CONDITIONAL for granted | 4 |
+  | a step out of the declared states accepted; `mkDfa` names the last bad step; **shortest word keeps each level backwards**; `isEmpty` counts unreachable states; reachable lists every declared state; **no obligation in the doc is vacuous success**; outcomes compared as lists; an invalid word's outcome run in a change; invalid words reach the outcome list; **the verdict ignores validity**; empty evidence counts | 3 |
+  | a foreign letter stepped on; no alphabet check on the product; a repeated obligation accepted; the ledger's read error names the document; letter pairs not compared; a change across the validity boundary counts; N counts reachable outcome states; the walk ignores the observed ranks; the outcome run on invalid words; the outcome automaton held to invalid words; **refuted passes**; a ledger-only obligation passes; a differing k passes; a k recorded larger than declared passes; a null k passes; `highestLevel` never says PROVED; a refused level does not say REFUSED; another pattern's certificate accepted; the conflict names the entry's pattern; **`Conditional`, `Proved`, `Ledger` or `Required` constructor exported** (one row each) | 2 |
+  | each of: a repeated state, a repeated letter or an undeclared start accepted; product compares alphabets as sets; product understates its states; **shortest word takes the last of a level**; reachable not sorted; a bare `A` or prose counts as a row; a repeated row accepted; **an unknown status reads as discharged**, or as open; an absent k or k_V reads as unknown; a repeated scope accepted; the ledger reported before the document; bad UTF-8 decoded leniently; stable ignores masks; outcomes not compared; the streak does not reset; short ranks refused before the walk; declared validity not compared; validity walked before outcome in two passes; the subject's alphabet or the two automata's alphabets not compared; blank evidence counts; open with evidence passes; ledger-only obligations come first; problems in ledger order; k_V not compared; evidence in ledger order; the proof holds the wrong scope; unusable evidence outranks a refused CONDITIONAL; **a coverage proof mints a certificate**; **a violation mints a certificate anyway**; the certificate holds the wrong N; EMPIRICAL claims a bound; a short-ranks refusal hides N; a rollback, a survival or an application does not contradict; the counts are lost; **`Certificate` or `Dfa` constructor exported** | 1 |
+
+  That shows the tests can pass and can fail. It says nothing about the target, or about your implementation, which these tests have not yet met.
 
 | Dependency | Used by | Reason |
 |---|---|---|
